@@ -1,56 +1,80 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
-public class PlayerMoveFPS_Flattened : MonoBehaviour
+[RequireComponent(typeof(CharacterController))]
+public class PlayerController : MonoBehaviour
 {
-    public float speed = 4f;
-    public Transform optionalCameraForForward = null; // opcional: usar a forward da câmera (flattened) ao invés do corpo
-    private Rigidbody rb;
+    [Header("Referências")]
+    public Camera playerCamera; // arraste a Main Camera aqui (filha do Player)
+
+    [Header("Movimento")]
+    public float walkSpeed = 4f;
+    public float gravity = 20f;
+
+    [Header("Visão")]
+    public float lookSpeed = 2f;
+    public float lookXLimit = 45f;
+
+    Vector3 moveDirection = Vector3.zero;
+    float rotationX = 0f;
+    CharacterController characterController;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true;
-        rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-        rb.interpolation = RigidbodyInterpolation.Interpolate;
+        characterController = GetComponent<CharacterController>();
+
+        if (playerCamera == null)
+            playerCamera = GetComponentInChildren<Camera>();
+
+        // inicializa rotationX corretamente mesmo que localEulerAngles esteja em 0..360
+        if (playerCamera != null)
+        {
+            float initialPitch = playerCamera.transform.localEulerAngles.x;
+            if (initialPitch > 180f) initialPitch -= 360f;
+            rotationX = initialPitch;
+        }
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
-    void FixedUpdate()
+    void Update()
     {
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
+        // --- Mouse look (pitch na câmera, yaw no corpo) ---
+        float mx = Input.GetAxis("Mouse X") * lookSpeed;
+        float my = Input.GetAxis("Mouse Y") * lookSpeed;
 
-        Vector3 forward;
-        Vector3 right;
+        rotationX += -my;
+        rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
 
-        if (optionalCameraForForward != null)
+        if (playerCamera != null)
+            playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
+
+        transform.Rotate(0f, mx, 0f);
+
+        // --- Movimento plano XZ (sem pulo) ---
+        Vector3 forward = transform.TransformDirection(Vector3.forward);
+        Vector3 right = transform.TransformDirection(Vector3.right);
+
+        float inputV = Input.GetAxis("Vertical");   // W/S
+        float inputH = Input.GetAxis("Horizontal"); // A/D
+
+        Vector3 desiredMove = (forward * inputV + right * inputH).normalized * walkSpeed;
+
+        // preserva Y para gravidade
+        float y = moveDirection.y;
+
+        if (characterController.isGrounded)
         {
-            // Usa a direção da câmera, mas "achatada" no plano XZ
-            forward = optionalCameraForForward.forward;
-            forward.y = 0f;
-            forward.Normalize();
-
-            right = optionalCameraForForward.right;
-            right.y = 0f;
-            right.Normalize();
+            // mantém um pequeno valor negativo para "grudar" no chão
+            y = -1f;
         }
         else
         {
-            // Usa a direção do corpo (player), já sem componente Y
-            forward = transform.forward;
-            forward.y = 0f;
-            forward.Normalize();
-
-            right = transform.right;
-            right.y = 0f;
-            right.Normalize();
+            y -= gravity * Time.deltaTime;
         }
 
-        Vector3 dir = forward * v + right * h;
-        if (dir.sqrMagnitude > 1f) dir.Normalize();
+        moveDirection = new Vector3(desiredMove.x, y, desiredMove.z);
 
-        // aplica velocidade horizontal mantendo a velocidade Y (gravidade/salto)
-        Vector3 newVel = new Vector3(dir.x * speed, rb.velocity.y, dir.z * speed);
-        rb.velocity = newVel;
+        characterController.Move(moveDirection * Time.deltaTime);
     }
 }
