@@ -1,10 +1,13 @@
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(AudioSource))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Referências")]
-    public Camera playerCamera; // arraste a Main Camera aqui (filha do Player)
+    public Camera playerCamera;
+    private CharacterController characterController;
+    private AudioSource audioSource;
 
     [Header("Movimento")]
     public float walkSpeed = 4f;
@@ -14,18 +17,32 @@ public class PlayerController : MonoBehaviour
     public float lookSpeed = 2f;
     public float lookXLimit = 45f;
 
+    [Header("Passos")]
+    public AudioClip[] footstepClips;      // arraste aqui os clipes curtos (wav/ogg)
+    public float stepInterval = 0.45f;     // tempo mínimo entre passos (segundos)
+    [Range(0.5f, 1.5f)]
+    public float stepVolume = 1f;
+
     Vector3 moveDirection = Vector3.zero;
     float rotationX = 0f;
-    CharacterController characterController;
+    float stepTimer = 0f;
 
     void Start()
     {
         characterController = GetComponent<CharacterController>();
+        audioSource = GetComponent<AudioSource>();
 
         if (playerCamera == null)
             playerCamera = GetComponentInChildren<Camera>();
 
-        // inicializa rotationX corretamente mesmo que localEulerAngles esteja em 0..360
+        // AudioSource config recomendada:
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 1f; // som 3D
+        audioSource.rolloffMode = AudioRolloffMode.Logarithmic;
+        audioSource.minDistance = 1f;
+        audioSource.maxDistance = 20f;
+
+        // inicializa rotationX corretamente
         if (playerCamera != null)
         {
             float initialPitch = playerCamera.transform.localEulerAngles.x;
@@ -39,7 +56,12 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // --- Mouse look (pitch na câmera, yaw no corpo) ---
+        HandleLook();
+        HandleMovement();
+    }
+
+    void HandleLook()
+    {
         float mx = Input.GetAxis("Mouse X") * lookSpeed;
         float my = Input.GetAxis("Mouse Y") * lookSpeed;
 
@@ -50,22 +72,24 @@ public class PlayerController : MonoBehaviour
             playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
 
         transform.Rotate(0f, mx, 0f);
+    }
 
-        // --- Movimento plano XZ (sem pulo) ---
+    void HandleMovement()
+    {
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
 
-        float inputV = Input.GetAxis("Vertical");   // W/S
-        float inputH = Input.GetAxis("Horizontal"); // A/D
+        float inputV = Input.GetAxis("Vertical");
+        float inputH = Input.GetAxis("Horizontal");
 
-        Vector3 desiredMove = (forward * inputV + right * inputH).normalized * walkSpeed;
+        Vector3 desiredMove = (forward * inputV + right * inputH);
+        if (desiredMove.sqrMagnitude > 1f) desiredMove.Normalize();
+        desiredMove *= walkSpeed;
 
-        // preserva Y para gravidade
+        // preserve Y (gravidade)
         float y = moveDirection.y;
-
         if (characterController.isGrounded)
         {
-            // mantém um pequeno valor negativo para "grudar" no chão
             y = -1f;
         }
         else
@@ -74,7 +98,29 @@ public class PlayerController : MonoBehaviour
         }
 
         moveDirection = new Vector3(desiredMove.x, y, desiredMove.z);
-
         characterController.Move(moveDirection * Time.deltaTime);
+
+        // --- passos ---
+        stepTimer -= Time.deltaTime;
+
+        // considera que o jogador está "andando" se houver input significativo e estiver no chão
+        bool isMoving = characterController.isGrounded && (Mathf.Abs(inputV) > 0.1f || Mathf.Abs(inputH) > 0.1f);
+
+        if (isMoving && stepTimer <= 0f)
+        {
+            PlayFootstep();
+            stepTimer = stepInterval;
+        }
+    }
+
+    void PlayFootstep()
+    {
+        if (footstepClips == null || footstepClips.Length == 0) return;
+
+        int idx = Random.Range(0, footstepClips.Length);
+        AudioClip clip = footstepClips[idx];
+
+        // PlayOneShot para permitir sobreposição (caso tenha mais de um som tocando)
+        audioSource.PlayOneShot(clip, stepVolume);
     }
 }
