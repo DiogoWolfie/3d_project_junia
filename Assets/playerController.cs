@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
     public float lookSpeed = 2f;
     public float lookXLimit = 45f;
 
-    //audio
+    //audiow
     public AudioClip[] footstepClips;    
     public float stepInterval = 0.45f;  
     [Range(0.5f, 1.5f)]

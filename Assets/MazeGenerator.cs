@@ -17,7 +17,11 @@ public class MazeGenerator : MonoBehaviour
 
     private MazeCell[,] _mazeGrid;
     // Start is called before the first frame update
-    IEnumerator Start()
+
+    [SerializeField] 
+    private float _cellSize = 2f; // ajuste para 2 se quer dobrar
+
+    void Start()
     {
         _mazeGrid = new MazeCell[_mazeWidth, _mazeDepth];
 
@@ -26,19 +30,17 @@ public class MazeGenerator : MonoBehaviour
         {
             for (int z = 0; z < _mazeDepth; z++)
             {
-                _mazeGrid[x, z] = Instantiate(_mazeCellPrefab, new Vector3(x, 0f, z), Quaternion.identity);
+                _mazeGrid[x, z] = Instantiate(_mazeCellPrefab, new Vector3(x*_cellSize, 0f, z*_cellSize), Quaternion.identity);
             }
         }
 
-        yield return GenerateMaze(null, _mazeGrid[0, 0]);
+       GenerateMaze(null, _mazeGrid[0, 0]);
     }
 
-    private IEnumerator GenerateMaze(MazeCell previousCell, MazeCell currentCell)
+    private void GenerateMaze(MazeCell previousCell, MazeCell currentCell)
     {
         currentCell.Visit();
         ClearWalls(previousCell, currentCell);
-
-        yield return new WaitForSeconds(0.05f);
 
         MazeCell nextCell;
         do
@@ -47,7 +49,7 @@ public class MazeGenerator : MonoBehaviour
 
             if (nextCell != null)
             {
-                yield return GenerateMaze(currentCell, nextCell);
+               GenerateMaze(currentCell, nextCell);
             }
         } while (nextCell != null);
 
@@ -62,8 +64,8 @@ public class MazeGenerator : MonoBehaviour
     
     private IEnumerable<MazeCell> GetUnvisitedCells(MazeCell currentCell)
     {
-        int x = (int)currentCell.transform.position.x;
-        int z = (int)currentCell.transform.position.z;
+        int x = Mathf.RoundToInt(currentCell.transform.position.x / _cellSize);
+        int z = Mathf.RoundToInt(currentCell.transform.position.z / _cellSize);
 
         if (x + 1 < _mazeWidth)
         {
