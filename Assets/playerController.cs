@@ -4,22 +4,22 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class PlayerController : MonoBehaviour
 {
-    [Header("Referências")]
+    //references
     public Camera playerCamera;
     private CharacterController characterController;
     private AudioSource audioSource;
 
-    [Header("Movimento")]
+    //movement
     public float walkSpeed = 4f;
     public float gravity = 20f;
 
-    [Header("Visão")]
+    //vision
     public float lookSpeed = 2f;
     public float lookXLimit = 45f;
 
-    [Header("Passos")]
-    public AudioClip[] footstepClips;      // arraste aqui os clipes curtos (wav/ogg)
-    public float stepInterval = 0.45f;     // tempo mínimo entre passos (segundos)
+    //audio
+    public AudioClip[] footstepClips;    
+    public float stepInterval = 0.45f;  
     [Range(0.5f, 1.5f)]
     public float stepVolume = 1f;
 
@@ -35,14 +35,13 @@ public class PlayerController : MonoBehaviour
         if (playerCamera == null)
             playerCamera = GetComponentInChildren<Camera>();
 
-        // AudioSource config recomendada:
+        
         audioSource.playOnAwake = false;
-        audioSource.spatialBlend = 1f; // som 3D
+        audioSource.spatialBlend = 1f; 
         audioSource.rolloffMode = AudioRolloffMode.Logarithmic;
         audioSource.minDistance = 1f;
         audioSource.maxDistance = 20f;
 
-        // inicializa rotationX corretamente
         if (playerCamera != null)
         {
             float initialPitch = playerCamera.transform.localEulerAngles.x;
@@ -86,7 +85,7 @@ public class PlayerController : MonoBehaviour
         if (desiredMove.sqrMagnitude > 1f) desiredMove.Normalize();
         desiredMove *= walkSpeed;
 
-        // preserve Y (gravidade)
+        
         float y = moveDirection.y;
         if (characterController.isGrounded)
         {
