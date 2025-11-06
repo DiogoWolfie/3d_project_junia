@@ -10,7 +10,8 @@ public class PlayerController : MonoBehaviour
     private AudioSource audioSource;
 
     //movement
-    public float walkSpeed = 4f;
+    public float walkSpeed = 1f;
+    public float runSpeed = 50f;
     public float gravity = 20f;
 
     //vision
@@ -81,9 +82,12 @@ public class PlayerController : MonoBehaviour
         float inputV = Input.GetAxis("Vertical");
         float inputH = Input.GetAxis("Horizontal");
 
-        Vector3 desiredMove = (forward * inputV + right * inputH);
-        if (desiredMove.sqrMagnitude > 1f) desiredMove.Normalize();
-        desiredMove *= walkSpeed;
+        float currentSpeed = Input.GetMouseButton(0) ? runSpeed : walkSpeed;
+        stepInterval = Input.GetMouseButton(0) ? 0.3f : 0.5f; 
+
+        Vector3 desiredMove = (forward * inputV + right * inputH).normalized*currentSpeed;
+        // if (desiredMove.sqrMagnitude > 1f) desiredMove.Normalize();
+        // desiredMove *= walkSpeed;
 
         
         float y = moveDirection.y;
