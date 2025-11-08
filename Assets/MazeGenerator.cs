@@ -7,13 +7,13 @@ using System.Linq; //aleatoriedade
 public class MazeGenerator : MonoBehaviour
 {
     [SerializeField]
-    private MazeCell _mazeCellPrefab;
+    public MazeCell _mazeCellPrefab;
 
     [SerializeField]
-    private int _mazeWidth;
+    public int _mazeWidth;
     
     [SerializeField] 
-    private int _mazeDepth;
+    public int _mazeDepth;
 
     private MazeCell[,] _mazeGrid;
     // Start is called before the first frame update
