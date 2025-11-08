@@ -25,7 +25,10 @@ public class StartMenu : MonoBehaviour
 
     public void onQuitButton()
     {
-        Debug.Log("Quit was pressed");
-        // Application.Quit();
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
+        #endif
     }
 }
