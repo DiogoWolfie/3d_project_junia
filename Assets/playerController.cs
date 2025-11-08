@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
 
     //movement
     public float walkSpeed = 1f;
-    public float runSpeed = 50f;
+    public float runSpeed = 2f;
     public float gravity = 20f;
 
     //vision
@@ -20,9 +20,12 @@ public class PlayerController : MonoBehaviour
 
     //audiow
     public AudioClip[] footstepClips;    
-    public float stepInterval = 0.45f;  
+    public float stepInterval = 0.4f;
     [Range(0.5f, 1.5f)]
-    public float stepVolume = 1f;
+    public float stepVolume = 0.4f;
+    
+    //key
+    public bool hasKey = false;
 
     Vector3 moveDirection = Vector3.zero;
     float rotationX = 0f;
@@ -125,5 +128,25 @@ public class PlayerController : MonoBehaviour
 
         // PlayOneShot para permitir sobreposição (caso tenha mais de um som tocando)
         audioSource.PlayOneShot(clip, stepVolume);
+    }
+
+    public void OnKeyCollected()
+    {
+        hasKey = true;
+        Debug.Log("Player got the key!");
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        if (hit.collider == null) return;
+        if (!hit.collider.CompareTag("Door")) return;
+
+        DoorBehaviour door = hit.collider.GetComponent<DoorBehaviour>();
+        if (door == null) return;
+
+        if (hasKey)
+            door.Open();
+        else
+            Debug.Log("door lock!");
     }
 }
