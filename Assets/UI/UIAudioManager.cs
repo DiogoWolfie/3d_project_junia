@@ -2,10 +2,8 @@ using UnityEngine;
 
 public class UIAudioManager : MonoBehaviour
 {
-    public static UIAudioManager Instance { get; private set; }
-
     [Header("Audio Source")]
-    public AudioSource audioSource; // The single shared AudioSource
+    public AudioSource audioSource;
 
     [Header("UI Sounds")]
     public AudioClip hoverSfx;
@@ -16,34 +14,24 @@ public class UIAudioManager : MonoBehaviour
 
     void Awake()
     {
-        // Singleton setup
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        Instance = this;
-        DontDestroyOnLoad(gameObject); // persist across scenes
-
-        // Auto-setup
         if (audioSource == null)
         {
             audioSource = gameObject.AddComponent<AudioSource>();
             audioSource.playOnAwake = false;
-            audioSource.spatialBlend = 0f; // 2D
+            audioSource.spatialBlend = 0f;
+            audioSource.ignoreListenerPause = true;
         }
     }
 
     public void PlayHover()
     {
-        if (hoverSfx && audioSource)
+        if (hoverSfx != null)
             audioSource.PlayOneShot(hoverSfx, hoverVolume);
     }
 
     public void PlayClick()
     {
-        if (clickSfx && audioSource)
+        if (clickSfx != null)
             audioSource.PlayOneShot(clickSfx, clickVolume);
     }
 }

@@ -7,7 +7,10 @@ public class ButtonHoverEffect : MonoBehaviour,
     IPointerDownHandler, IPointerUpHandler
 {
     [Header("Target Text")]
-    public TextMeshProUGUI buttonText;   // Drag your TMP text here
+    public TextMeshProUGUI buttonText;
+
+    [Header("Audio (optional)")]
+    public UIAudioManager uiAudio;
 
     [Header("Scale Settings")]
     public float hoverScale = 1.1f;
@@ -15,15 +18,15 @@ public class ButtonHoverEffect : MonoBehaviour,
     public float smoothSpeed = 8f;
 
     [Header("Color Settings")]
-    public Color normalColor = new Color32(235, 235, 235, 255); // light gray
-    public Color hoverColor  = new Color32(212, 175, 55, 255);  // gold
-    public Color clickColor  = new Color32(234, 197, 77, 255);  // brighter gold
+    public Color normalColor = new Color32(235, 235, 235, 255);
+    public Color hoverColor  = new Color32(212, 175, 55, 255);
+    public Color clickColor  = new Color32(234, 197, 77, 255);
     public float colorLerpSpeed = 10f;
 
     [Header("Hover Pulse Effect")]
     public bool pulseOnHover = true;
-    public float pulseAmplitude = 0.05f;   // how much it scales up/down
-    public float pulseSpeed = 2f;          // how fast it pulses
+    public float pulseAmplitude = 0.05f;
+    public float pulseSpeed = 2f;
 
     private Vector3 originalScale;
     private Vector3 targetScale;
@@ -37,6 +40,9 @@ public class ButtonHoverEffect : MonoBehaviour,
         if (buttonText == null)
             buttonText = GetComponentInChildren<TextMeshProUGUI>();
 
+        if (uiAudio == null)
+            uiAudio = FindObjectOfType<UIAudioManager>();
+
         originalScale = buttonText.rectTransform.localScale;
         targetScale = originalScale;
         targetColor = normalColor;
@@ -45,10 +51,8 @@ public class ButtonHoverEffect : MonoBehaviour,
 
     void Update()
     {
-        // --- Smooth scaling ---
         Vector3 finalTarget = targetScale;
 
-        // Pulse if hovered (and not pressed)
         if (isHovered && !isPressed && pulseOnHover)
         {
             float pulse = Mathf.Sin(Time.unscaledTime * pulseSpeed) * pulseAmplitude;
@@ -61,7 +65,6 @@ public class ButtonHoverEffect : MonoBehaviour,
             Time.deltaTime * smoothSpeed
         );
 
-        // --- Smooth color transition ---
         buttonText.color = Color.Lerp(
             buttonText.color,
             targetColor,
@@ -75,8 +78,7 @@ public class ButtonHoverEffect : MonoBehaviour,
         targetColor = hoverColor;
         targetScale = originalScale * hoverScale;
 
-        // 🔊 Play hover sound
-        UIAudioManager.Instance?.PlayHover();
+        uiAudio?.PlayHover();
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -92,8 +94,7 @@ public class ButtonHoverEffect : MonoBehaviour,
         targetColor = clickColor;
         targetScale = originalScale * clickScale;
 
-        // 🔊 Play click sound
-        UIAudioManager.Instance?.PlayClick();
+        uiAudio?.PlayClick();
     }
 
     public void OnPointerUp(PointerEventData eventData)

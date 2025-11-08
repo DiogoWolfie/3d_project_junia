@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -8,27 +6,27 @@ public class StartMenu : MonoBehaviour
     public void onPlayButton()
     {
         Debug.Log("Play was pressed");
-        // SceneManager.LoadScene("");
+        SceneManager.LoadScene(1);
     }
 
-    public void onLoadButton()
-    {
-        Debug.Log("Load was pressed");
-         // SceneManager.LoadScene("");
-    }
+public void onResumeButton()
+{
+    Debug.Log("Resume was pressed");
 
-    public void onResumeButton()
+    SceneManager.UnloadSceneAsync(2).completed += _ =>
     {
-        Debug.Log("Resume was pressed");
-         // SceneManager.LoadScene("");
-    }
+        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(1));
+    };
+
+}
 
     public void onQuitButton()
     {
-        #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-        #else
-            Application.Quit();
-        #endif
+        Debug.Log("Quit was pressed");
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 }
