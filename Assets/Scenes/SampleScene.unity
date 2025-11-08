@@ -177,7 +177,7 @@ MonoBehaviour:
   lookSpeed: 2
   lookXLimit: 45
   footstepClips:
-  - {fileID: 8300000, guid: 314755392aa072e4eb6fc3b02b791b72, type: 3}
+  - {fileID: 8300000, guid: 3e10d68c7f7aa854694549c916e8ba46, type: 3}
   stepInterval: 0.4
   stepVolume: 1
   hasKey: 0
@@ -217,7 +217,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 314755392aa072e4eb6fc3b02b791b72, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 3e10d68c7f7aa854694549c916e8ba46, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.5
   m_Pitch: 1
@@ -348,6 +348,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _mazeCellPrefab: {fileID: 4990735546214242934, guid: 4d02b613ebd5fc545961f59f78292981, type: 3}
+  variantEntries:
+  - {fileID: 2140860452238091655, guid: e53651f5bba02fb46a764409a6459dfd, type: 3}
+  - {fileID: 6384051429745537622, guid: 65da4e5a4d9095e4aa665916b41462d8, type: 3}
+  - {fileID: 2566473433810552924, guid: 3d14e3ece65c6cf4b8a2340fa11d043a, type: 3}
+  - {fileID: 8003231893940507982, guid: 5058f0cda1224ad47baaf17592288bf6, type: 3}
   _mazeWidth: 20
   _mazeDepth: 20
   _cellSize: 2
