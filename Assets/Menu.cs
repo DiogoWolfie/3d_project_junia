@@ -9,16 +9,19 @@ public class StartMenu : MonoBehaviour
         SceneManager.LoadScene(1);
     }
 
-public void onResumeButton()
-{
-    Debug.Log("Resume was pressed");
-
-    SceneManager.UnloadSceneAsync(2).completed += _ =>
+    public void onResumeButton()
     {
-        SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(1));
-    };
+        Debug.Log("Resume was pressed");
 
-}
+        SceneManager.UnloadSceneAsync(2).completed += _ =>
+        {
+            SceneManager.SetActiveScene(SceneManager.GetSceneByBuildIndex(1));
+        };
+
+        Time.timeScale = 1f;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+    }
 
     public void onQuitButton()
     {
