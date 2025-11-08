@@ -11,6 +11,12 @@ public class StartMenu : MonoBehaviour
         // SceneManager.LoadScene("");
     }
 
+    public void onLoadButton()
+    {
+        Debug.Log("Load was pressed");
+         // SceneManager.LoadScene("");
+    }
+
     public void onResumeButton()
     {
         Debug.Log("Resume was pressed");
