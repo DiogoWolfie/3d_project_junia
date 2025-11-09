@@ -16,13 +16,13 @@ public class MazeGenerator : MonoBehaviour
     [SerializeField]
     public int _mazeWidth;
     
-    [SerializeField] 
+    [SerializeField]
     public int _mazeDepth;
     
-    [SerializeField] 
+    [SerializeField]
     private float _cellSize = 2f;
     
-    [SerializeField] 
+    [SerializeField]
     private Transform mazeRoot;
 
     private MazeCell[,] _mazeGrid;
@@ -35,7 +35,7 @@ public class MazeGenerator : MonoBehaviour
 
     private const float TARGET_VARIANT_FRACTION = 0.30f;
 
-    private MazeCell[] _detectedVariants = null; 
+    private MazeCell[] _detectedVariants = null;
 
     void Start()
     {
