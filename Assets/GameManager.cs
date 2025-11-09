@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
         var agent = _spawnedEnemy.GetComponent<NavMeshAgent>();
         if (agent) { agent.isStopped = true; agent.ResetPath(); }
 
-        Time.timeScale = 0f;
+        Time.timeScale = 1f;
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
