@@ -28,7 +28,7 @@ public class PlayerController : MonoBehaviour
     public AudioClip[] footstepClips;    
     public float stepInterval = 0.4f;
     [Range(0.5f, 1.5f)]
-    public float stepVolume = 0.4f;
+    public float stepVolume = 0.2f;
     
     //key
     public bool hasKey = false;

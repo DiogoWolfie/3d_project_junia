@@ -162,14 +162,14 @@ public class MazeGenerator : MonoBehaviour
 
     void StartPlaceholder() { } // placeholder to keep structure identical if desired
 
-    private void OnValidate()
-    {
+    // private void OnValidate()
+    // {
         
-        if (variantEntries != null && variantEntries.Length > 0)
-        {
-            variantEntries = variantEntries.Where(v => v != null).ToArray();
-        }
-    }
+    //     if (variantEntries != null && variantEntries.Length > 0)
+    //     {
+    //         variantEntries = variantEntries.Where(v => v != null).ToArray();
+    //     }
+    // }
 
     // (tu Update vacío se puede quedar)
 }
