@@ -2,21 +2,26 @@ using System.Collections;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private MazeGenerator maze;     // Objeto con MazeGenerator
-    [SerializeField] private GameObject enemyPrefab; // Prefab enemigo
-    [SerializeField] private Transform player;       // Jugador
+    [SerializeField] private MazeGenerator maze;
+    [SerializeField] private GameObject enemyPrefab;
+    [SerializeField] private Transform player;
 
     [Header("Spawn")]
     [SerializeField] private int minCellDistanceFromPlayer = 6;
     [SerializeField] private KeyCode bringEnemyKey = KeyCode.B;
     [SerializeField] private float bringDistanceMeters = 6f;
 
+    [Header("Catch Settings")]
+    [SerializeField] private float catchRadius = 1.2f;   // tune to model size
+
     // >>> ESTO ES LO QUE TE FALTABA <<<
     private Transform _spawnedEnemy;
+    private bool gameOverFired = false;
 
     private void Awake()
     {
@@ -73,12 +78,32 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (_spawnedEnemy != null && Input.GetKeyDown(bringEnemyKey))
-            BringEnemyNearPlayer();
+        if (_spawnedEnemy && Input.GetKeyDown(bringEnemyKey)) BringEnemyNearPlayer();
+
+        // Lose detection
+        if (!gameOverFired && _spawnedEnemy && player)
+        {
+            float sq = (_spawnedEnemy.position - player.position).sqrMagnitude;
+            if (sq <= catchRadius * catchRadius) TriggerGameOver();
+        }
     }
 
-    // ----------- Spawn Helpers -----------
+    private void TriggerGameOver()
+    {
+        if (gameOverFired) return;
+        gameOverFired = true;
 
+        var agent = _spawnedEnemy.GetComponent<NavMeshAgent>();
+        if (agent) { agent.isStopped = true; agent.ResetPath(); }
+
+        Time.timeScale = 0f;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        SceneManager.LoadScene(4);
+    }
+
+    // ---- Spawn helpers ----
     private Vector3 PickSpawnOnNavMeshFarFromPlayer()
     {
         Vector3 playerPos = player.position;
