@@ -184,7 +184,7 @@ public class GameManager : MonoBehaviour
         var l = t.gameObject.AddComponent<Light>();
         l.type = LightType.Point;
         l.color = Color.red;
-        l.intensity = 8f;
+        l.intensity = 1.2f;
         l.range = 10f;
     }
 
