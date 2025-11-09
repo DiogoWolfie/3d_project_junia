@@ -1,10 +1,16 @@
 using UnityEngine;
+using TMPro; 
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(AudioSource))]
 public class PlayerController : MonoBehaviour
 {
     //references
+
+    public TextMeshProUGUI introText; // Opção A: TextMeshPro (recomendado)
+    public float introDuration = 4f; 
+    private float introTimer = 0f;
+    private bool showingIntro = true;
     public Camera playerCamera;
     private CharacterController characterController;
     private AudioSource audioSource;
@@ -53,12 +59,29 @@ public class PlayerController : MonoBehaviour
             rotationX = initialPitch;
         }
 
+        if (introText != null)
+        {
+            introText.gameObject.SetActive(true);
+            introTimer = introDuration;
+            showingIntro = true;
+        }
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
     void Update()
     {
+        
+        if (showingIntro && introText != null)
+        {
+            introTimer -= Time.deltaTime;
+            if (introTimer <= 0f)
+            {
+                introText.gameObject.SetActive(false);
+                showingIntro = false;
+            }
+        }
         HandleLook();
         HandleMovement();
     }
